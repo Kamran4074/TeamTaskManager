@@ -11,6 +11,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
@@ -18,6 +24,7 @@ app.use('/api/tasks', taskRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
+  console.log('Health check endpoint called');
   res.status(200).json({ success: true, message: 'Server is running' });
 });
 
@@ -28,6 +35,7 @@ app.use('/api', (req, res) => {
 
 // Root endpoint
 app.get('/', (req, res) => {
+  console.log('Root endpoint called');
   res.status(200).json({ 
     success: true, 
     message: 'TeamTaskManager API Server',
@@ -43,8 +51,8 @@ app.get('/', (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ success: false, message: 'Internal server error' });
+  console.error('Error:', err);
+  res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
 });
 
 export default app;
