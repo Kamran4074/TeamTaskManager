@@ -1,21 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes.js';
-import projectRoutes from './routes/projectRoutes.js';
-import taskRoutes from './routes/taskRoutes.js';
 
 const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'https://team-task-manager-plum.vercel.app',
-    'https://teamtaskmanager.vercel.app',
-    /\.vercel\.app$/  // Allow all Vercel deployments
-  ],
-  credentials: true,
+  origin: '*',  // Allow all origins for now
+  credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
@@ -31,7 +22,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Simple health check - no dependencies
+// Simple health check
 app.get('/health', (req, res) => {
   console.log('Health check called');
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -43,21 +34,18 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
 });
 
-// API routes
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/tasks', taskRoutes);
-
 // Root endpoint
 app.get('/', (req, res) => {
   console.log('Root endpoint called');
   res.status(200).json({ 
     success: true, 
     message: 'TeamTaskManager API Server',
-    version: '1.0.0',
-    timestamp: new Date().toISOString()
+    version: '1.0.0'
   });
 });
+
+// OPTIONS handler for CORS preflight
+app.options('*', cors(corsOptions));
 
 // 404 handler
 app.use((req, res) => {
