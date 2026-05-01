@@ -4,12 +4,14 @@ import app from './src/app.js';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
+const HOST = '0.0.0.0';
 
 const startServer = async () => {
   try {
     console.log('Starting server...');
     console.log('PORT:', PORT);
+    console.log('HOST:', HOST);
     console.log('NODE_ENV:', process.env.NODE_ENV);
     
     // Connect to database
@@ -18,9 +20,9 @@ const startServer = async () => {
     console.log('MongoDB connection successful');
 
     // Start server
-    const server = app.listen(PORT, '0.0.0.0', () => {
-      console.log(`✓ Server running on port ${PORT}`);
-      console.log(`✓ API available at http://localhost:${PORT}/api`);
+    const server = app.listen(PORT, HOST, () => {
+      console.log(`✓ Server running on ${HOST}:${PORT}`);
+      console.log(`✓ API available at http://${HOST}:${PORT}/api`);
     });
 
     // Handle server errors
