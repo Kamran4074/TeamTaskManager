@@ -1,0 +1,10 @@
+node_modules
+.git
+.gitignore
+README.md
+STRUCTURE.md
+.vscode
+.env.example
+frontend/dist
+backend/node_modules
+frontend/node_modules
