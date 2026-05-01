@@ -1,8 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes.js';
-import projectRoutes from './routes/projectRoutes.js';
-import taskRoutes from './routes/taskRoutes.js';
 
 const app = express();
 
@@ -17,20 +14,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/tasks', taskRoutes);
-
 // Health check
 app.get('/api/health', (req, res) => {
   console.log('Health check endpoint called');
   res.status(200).json({ success: true, message: 'Server is running' });
-});
-
-// 404 handler for API routes
-app.use('/api', (req, res) => {
-  res.status(404).json({ success: false, message: 'API route not found' });
 });
 
 // Root endpoint
@@ -39,14 +26,13 @@ app.get('/', (req, res) => {
   res.status(200).json({ 
     success: true, 
     message: 'TeamTaskManager API Server',
-    version: '1.0.0',
-    endpoints: {
-      health: '/api/health',
-      auth: '/api/auth',
-      projects: '/api/projects',
-      tasks: '/api/tasks'
-    }
+    version: '1.0.0'
   });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: 'Route not found' });
 });
 
 // Error handler
