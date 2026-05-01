@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = '/api';
+// Use Railway backend API in production, local in development
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://teamtaskmanager-production-d52c.up.railway.app/api'
+  : '/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
