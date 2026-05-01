@@ -6,16 +6,40 @@ import taskRoutes from './routes/taskRoutes.js';
 
 const app = express();
 
-// CORS configuration
+// CORS configuration - MUST be before routes
 const corsOptions = {
-  origin: '*',  // Allow all origins
-  credentials: false,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5173',
+      'https://team-task-manager-plum.vercel.app',
+      'https://teamtaskmanager.vercel.app'
+    ];
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all for now
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 };
 
-// Middleware
+// Apply CORS middleware FIRST
 app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
+// Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -25,18 +49,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/tasks', taskRoutes);
-
-// Simple health check
+// Health check endpoints
 app.get('/health', (req, res) => {
   console.log('Health check called');
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// API health check
 app.get('/api/health', (req, res) => {
   console.log('API health check called');
   res.status(200).json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
@@ -52,8 +70,10 @@ app.get('/', (req, res) => {
   });
 });
 
-// OPTIONS handler for CORS preflight
-app.options('*', cors(corsOptions));
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // 404 handler
 app.use((req, res) => {
